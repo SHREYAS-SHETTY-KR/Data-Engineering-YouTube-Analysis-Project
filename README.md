@@ -4,23 +4,6 @@
 
 Our project aims to securely manage, streamline, and analyze structured and semi-structured YouTube video data from three countries: the USA, Great Britain, and Canada. The primary focus is on video categories and trending metrics.
 
-## Key Research Questions
-Our project addresses three main research questions:
-
-1. **Country Comparison**
-
-   Which of the three countries (USA, Great Britain, or Canada) had the highest number of views across all videos?
-
-3. **Category Analysis**
-  
-   Which video categories garnered the most views overall?
-
-3. **Regional Differences**
-
-   How do views vary across video categories in each of the three regions (USA, Great Britain, Canada)?
-   
-By answering these questions, our project provides valuable insights into viewership trends across different countries and video categories on YouTube. This analysis helps us understand the popularity and preferences of viewers in these regions.
-
 ## Project Goals
 
 1. **Data Ingestion:** Develop a robust mechanism to ingest data from various sources.
@@ -37,6 +20,8 @@ By answering these questions, our project provides valuable insights into viewer
 
 These project goals collectively aim to establish a data pipeline that can efficiently handle, process, and analyze large datasets from diverse sources while ensuring scalability and ease of reporting through cloud-based infrastructure.
 
+## Architecture Diagram
+   <img src="Images/architecture.jpeg">
 
 ## Services Used
 
@@ -59,6 +44,60 @@ This Kaggle dataset contains statistics (CSV files) on daily popular YouTube vid
 
 https://www.kaggle.com/datasets/datasnaek/youtube-new
 
-## Architecture Diagram
-![Image Alt Text](architecture.jpeg)
+## Project Execution Flow
+
+**Step 1: Data Ingestion**
+Create an S3 Bucket for Raw Data.
+Upload YouTube data to the S3 bucket using the AWS CLI for efficient data partitioning and organization.
+
+**Step 2: Data Catalog and Initial Processing**
+
+Utilize AWS Glue Data Catalog to establish a catalog for data.
+Implement a crawler to catalog both CSV and JSON files.
+The catalog output feeds into Amazon Athena, where tables within a database are created for data exploration.
+
+<img src="Images/Glue Catalog.png">
+
+**Step 3: Data Pre-processing**
+
+Identify errors in the JSON format (SerDe) file structures.
+Develop an AWS Lambda function to preprocess and convert JSON files to Parquet format.
+Configure Lambda to trigger automatically upon data uploads to the S3 bucket.
+The processed data is stored in a separate S3 bucket and an associated Athena database, allowing schema and data type validation.
+
+<img src="Images/CSV-Parquet.png">
+
+**Step 4: ETL Processing for CSV Data**
+
+Convert CSV files to Parquet format.
+Employ AWS Glue ETL job to further process and clean the data.
+Store the cleaned data in a designated S3 bucket.
+
+**Step 5: Additional Data Catalog and Database**
+
+Create a second AWS Glue Data Catalog crawler to catalog the cleaned data.
+Populate a second database with cataloged tables.
+
+**Step 6: Data Integration and Final Preparation**
+
+Build a new ETL job in AWS Glue to combine and join the cleaned tables.
+Store the integrated data in the final S3 bucket, ready for analytics.
+
+**Step 7: Analytics and Utilization**
+
+The prepared data is now available for various applications, including dashboard reporting and machine learning models.
+
+Create a dashboard using AWS QuickSight for data visualization and analysis.
+
+<img src="Images/dashboard.jpg">
+
+## Key Questions Addressed by the Dashboard
+
+The dashboard is designed to address the following key questions:
+
+**Which country had more views?** - The dashboard will display comparative views data for the USA, Great Britain, and Canada, allowing users to determine which country had the highest views.
+
+**Which video category had more views?** - Users can explore the data to identify which video categories garnered the most views.
+
+**How did the views differ per category for the different regions?** - The dashboard provides a region-wise breakdown of views across different video categories, enabling users to understand variations in viewership.
 
